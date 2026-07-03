@@ -13,7 +13,7 @@ const BoardSchema=new mongoose.Schema({
     lists:[
         {
             type:mongoose.Schema.Types.ObjectId,
-            ref='List'
+            ref:'List'
 
         }
     ],
