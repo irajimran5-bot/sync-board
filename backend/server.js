@@ -16,7 +16,7 @@ app.get('/',(req,res)=>{
 });
 app.use('/api/boards',require('./routes/boardRoutes'));
 app.use('/api/lists',require('./routes/listRoutes'));
-
+app.use('/api/cards',require('./routes/cardRoutes'));
 const PORT=process.env.PORT||5000;
 app.listen(PORT,()=>{
     console.log(`Running on port: ${PORT}`);
