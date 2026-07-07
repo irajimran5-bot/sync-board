@@ -5,18 +5,22 @@ import ListColumn from './components/ListColumn';
 function App() {
   const [board, setBoard] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [error, setError] = useState(null);
   const TARGET_BOARD_ID = "6a4a29348b37e4f8b7b2fce0"; 
 
   useEffect(() => {
     const getWorkspaceData = async () => {
       try {
         setLoading(true);
+        setError(null);
+        console.log("Fetching started for ID:", TARGET_BOARD_ID);
         const data = await fetchBoardData(TARGET_BOARD_ID);
+        console.log("RAW DATABASE TREE FETCHED:", JSON.stringify(data, null, 2));
         setBoard(data);
       } catch (err) {
-        console.error("Failed mounting component tree:", err);
-      } finally {
+        console.error("CRITICAL GATEWAY ERROR:", err.message, err.response?.data);
+        setError(err.message || "Failed to load workspace");
+      }finally{
         setLoading(false);
       }
     };

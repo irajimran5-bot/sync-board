@@ -3,7 +3,7 @@ const List=require('../models/List');
 
 exports.createCard=async(req,res)=>{
     try{
-        const {title,description,listId,label}=res.body;
+        const {title,description,listId,label}=req.body;
         if(!title||!listId){
             return res.status(400).json({message:'Title and list ID are required'});
         }   
