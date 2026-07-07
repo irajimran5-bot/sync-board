@@ -1,18 +1,66 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { fetchBoardData } from './api/boardApi';
+import ListColumn from './components/ListColumn';
 
 function App() {
-  return (
-    <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-4">
-      <div className="max-w-md w-full bg-slate-800 rounded-xl shadow-2xl border border-slate-700 p-8 text-center">
-        <h1 className="text-3xl font-extrabold tracking-tight bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-          SyncBoard Core UI
-        </h1>
-        <p className="mt-2 text-slate-400 font-medium">Day 4 Frontend Framework </p>
-        <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-semibold">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          Tailwind CSS Operational
+  const [board, setBoard] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const TARGET_BOARD_ID = "6a4a29348b37e4f8b7b2fce0"; 
+
+  useEffect(() => {
+    const getWorkspaceData = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchBoardData(TARGET_BOARD_ID);
+        setBoard(data);
+      } catch (err) {
+        console.error("Failed mounting component tree:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getWorkspaceData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-sm text-slate-400 font-medium">Synchronizing Workspace Architecture...</p>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-900 text-white flex flex-col">
+      {/* Header Bar */}
+      <header className="bg-slate-800/50 border-b border-slate-800 px-8 py-4 backdrop-blur-md">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-xl font-black tracking-wider bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent uppercase">
+              {board?.title || "Workspace Dashboard"}
+            </h1>
+            <p className="text-xs text-slate-400 mt-0.5">{board?.description || "Collaborative space"}</p>
+          </div>
+          <div className="text-xs bg-slate-700/50 border border-slate-600 px-3 py-1 rounded-md text-slate-300">
+            Status: Connected to Node Gateway
+          </div>
+        </div>
+      </header>
+
+      {/* Main Board Viewport */}
+      <main className="flex-1 p-8 overflow-x-auto flex items-start gap-6">
+        {board?.lists && board.lists.length > 0 ? (
+          board.lists.map((list) => <ListColumn key={list._id} list={list} />)
+        ) : (
+          <div className="m-auto text-center py-12">
+            <p className="text-slate-400">No layout structures matching this board profile.</p>
+          </div>
+        )}
+      </main>
     </div>
   );
 }
