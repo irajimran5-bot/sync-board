@@ -37,6 +37,8 @@ function ListColumn({ list, onCardAdded }) {
         <form onSubmit={handleSubmit} className="space-y-2">
           <input
             type="text"
+            id={`card-input-${list._id}`}
+            name="cardTitle"
             className="w-full bg-slate-900 text-sm text-white p-2 rounded-lg border border-cyan-500 focus:outline-hidden"
             placeholder="Enter card title..."
             value={cardTitle}

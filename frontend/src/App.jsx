@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchBoardData } from './api/boardApi';
+import { fetchBoardData, createList, createCard } from './api/boardApi'; 
 import ListColumn from './components/ListColumn';
 
 function App() {
@@ -9,24 +9,26 @@ function App() {
   const TARGET_BOARD_ID = "6a4a29348b37e4f8b7b2fce0"; 
   const [newListTitle, setNewListTitle] = useState('');
   const [isAddingList, setIsAddingList] = useState(false);
+  const getWorkspaceData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log("Fetching started for ID:", TARGET_BOARD_ID);
+      const data = await fetchBoardData(TARGET_BOARD_ID);
+      console.log("RAW DATABASE TREE FETCHED:", JSON.stringify(data, null, 2));
+      setBoard(data);
+    } catch (err) {
+      console.error("CRITICAL GATEWAY ERROR:", err.message, err.response?.data);
+      setError(err.message || "Failed to load workspace");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const getWorkspaceData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        console.log("Fetching started for ID:", TARGET_BOARD_ID);
-        const data = await fetchBoardData(TARGET_BOARD_ID);
-        console.log("RAW DATABASE TREE FETCHED:", JSON.stringify(data, null, 2));
-        setBoard(data);
-      } catch (err) {
-        console.error("CRITICAL GATEWAY ERROR:", err.message, err.response?.data);
-        setError(err.message || "Failed to load workspace");
-      }finally{
-        setLoading(false);
-      }
-    };
     getWorkspaceData();
   }, []);
+
   const handleAddList = async (e) => {
     e.preventDefault();
     if (!newListTitle.trim()) return;
@@ -39,16 +41,17 @@ function App() {
       alert("Error adding column. Check console.");
     }
   };
+
   const handleAddCard = async (listId, cardTitle) => {
     try {
       const cardPayload = {
         title: cardTitle,
         description: "Task created from browser workspace UI.",
         listId: listId,
-        label: "Normal"
+        label: "High" 
       };
       await createCard(cardPayload);
-      await getWorkspaceData();
+      await getWorkspaceData(); 
     } catch (err) {
       alert("Error adding card. Check console.");
     }
@@ -82,16 +85,16 @@ function App() {
       </header>
 
       <main className="flex-1 p-8 overflow-x-auto flex items-start gap-6">
-        {}
         {board && board.lists && board.lists.map((list) => (
           <ListColumn key={list._id} list={list} onCardAdded={handleAddCard} />
         ))}
 
-        {}
         {isAddingList ? (
           <form onSubmit={handleAddList} className="w-80 bg-slate-800/40 p-4 rounded-xl border border-slate-700/60 space-y-3 shrink-0">
             <input
               type="text"
+              id="new-list-input"
+              name="newListTitle"
               className="w-full bg-slate-900 text-sm text-white p-2 rounded-lg border border-cyan-400 focus:outline-hidden"
               placeholder="Enter column name (e.g., In Progress)..."
               value={newListTitle}
