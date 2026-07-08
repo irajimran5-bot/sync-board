@@ -26,8 +26,34 @@ function App() {
     };
     getWorkspaceData();
   }, []);
+  const handleAddList = async (e) => {
+    e.preventDefault();
+    if (!newListTitle.trim()) return;
+    try {
+      await createList(newListTitle, TARGET_BOARD_ID);
+      setNewListTitle('');
+      setIsAddingList(false);
+      await getWorkspaceData();
+    } catch (err) {
+      alert("Error adding column. Check console.");
+    }
+  };
+  const handleAddCard = async (listId, cardTitle) => {
+    try {
+      const cardPayload = {
+        title: cardTitle,
+        description: "Task created from browser workspace UI.",
+        listId: listId,
+        label: "Normal"
+      };
+      await createCard(cardPayload);
+      await getWorkspaceData();
+    } catch (err) {
+      alert("Error adding card. Check console.");
+    }
+  };
 
-  if (loading) {
+  if (loading && !board) {
     return (
       <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
@@ -40,29 +66,53 @@ function App() {
 
   return (
     <div className="min-h-screen bg-slate-900 text-white flex flex-col">
-      {/* Header Bar */}
       <header className="bg-slate-800/50 border-b border-slate-800 px-8 py-4 backdrop-blur-md">
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-xl font-black tracking-wider bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent uppercase">
               {board?.title || "Workspace Dashboard"}
             </h1>
-            <p className="text-xs text-slate-400 mt-0.5">{board?.description || "Collaborative space"}</p>
+            <p className="text-xs text-slate-400 mt-0.5">{board?.description || "Collaborative Kanban space"}</p>
           </div>
           <div className="text-xs bg-slate-700/50 border border-slate-600 px-3 py-1 rounded-md text-slate-300">
-            Status: Connected to Node Gateway
+            Status: Fully Operational 
           </div>
         </div>
       </header>
 
-      {/* Main Board Viewport */}
       <main className="flex-1 p-8 overflow-x-auto flex items-start gap-6">
-        {board?.lists && board.lists.length > 0 ? (
-          board.lists.map((list) => <ListColumn key={list._id} list={list} />)
+        {}
+        {board && board.lists && board.lists.map((list) => (
+          <ListColumn key={list._id} list={list} onCardAdded={handleAddCard} />
+        ))}
+
+        {}
+        {isAddingList ? (
+          <form onSubmit={handleAddList} className="w-80 bg-slate-800/40 p-4 rounded-xl border border-slate-700/60 space-y-3 shrink-0">
+            <input
+              type="text"
+              className="w-full bg-slate-900 text-sm text-white p-2 rounded-lg border border-cyan-400 focus:outline-hidden"
+              placeholder="Enter column name (e.g., In Progress)..."
+              value={newListTitle}
+              onChange={(e) => setNewListTitle(e.target.value)}
+              autoFocus
+            />
+            <div className="flex items-center gap-2">
+              <button type="submit" className="bg-cyan-500 hover:bg-cyan-600 text-slate-900 text-xs font-bold px-3 py-1.5 rounded-md transition-colors">
+                Add Column
+              </button>
+              <button type="button" onClick={() => setIsAddingList(false)} className="text-xs text-slate-400 hover:text-white px-2 py-1.5">
+                Cancel
+              </button>
+            </div>
+          </form>
         ) : (
-          <div className="m-auto text-center py-12">
-            <p className="text-slate-400">No layout structures matching this board profile.</p>
-          </div>
+          <button
+            onClick={() => setIsAddingList(true)}
+            className="w-80 border-2 border-dashed border-slate-800 hover:border-cyan-500/40 hover:bg-slate-800/40 text-slate-500 hover:text-cyan-400 p-4 rounded-xl font-bold text-sm transition-all duration-200 text-center shrink-0"
+          >
+            + Add New Column
+          </button>
         )}
       </main>
     </div>
