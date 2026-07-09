@@ -26,3 +26,12 @@ export const createCard=async(cardData)=>{
         throw error;
     }
 };
+export const deleteCard=async(cardId)=>{
+    try{
+        const response=await axios.delete(`/api/cards/${cardId}`);
+        return response.data;
+    }catch(error){
+        console.error("ERROR in deleting card",error);
+        throw error;
+    }
+};
