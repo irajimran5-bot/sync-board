@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import TaskCard from './TaskCard';
 
-function ListColumn({ list, onCardAdded }) {
+function ListColumn({ list, onCardAdded,onCardDeleted }) {
   const [isAdding, setIsAdding] = useState(false);
   const [cardTitle, setCardTitle] = useState('');
 
