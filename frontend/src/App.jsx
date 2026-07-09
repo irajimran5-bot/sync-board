@@ -56,7 +56,20 @@ function App() {
       alert("Error adding card. Check console.");
     }
   };
+  const handleCardDelete = async (cardId) => {
+    if (!window.confirm("Are you sure you want to completely remove this task?")) 
+      return;
+    try {
+      console.log("✈️ Broadcasting Delete Trigger for ID:", cardId);
+      await deleteCard(cardId);
+      await getWorkspaceData();
+    }catch(err){
+      console.error("MUTATION fault on delete",err);
+      alert(`Deletion aborted:${err.message}`);
 
+    }
+
+  }
   if (loading && !board) {
     return (
       <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center">
@@ -86,7 +99,12 @@ function App() {
 
       <main className="flex-1 p-8 overflow-x-auto flex items-start gap-6">
         {board && board.lists && board.lists.map((list) => (
-          <ListColumn key={list._id} list={list} onCardAdded={handleAddCard} />
+          <ListColumn 
+          key={list._id} 
+          list={list} 
+          onCardAdded={handleAddCard}
+          onCardDeleted={handleCardDelete}
+          />
         ))}
 
         {isAddingList ? (
