@@ -1,19 +1,33 @@
-import React from 'react';
+import React from 'react'
 
-function TaskCard({ card }) {
-  return (
-    <div className="bg-slate-700 p-4 rounded-lg shadow-md border border-slate-600 space-y-2 hover:border-cyan-500 transition-all cursor-pointer">
-      <div className="flex justify-between items-center">
-        <h4 className="font-semibold text-white text-sm">{card.title}</h4>
-        {card.label && (
-          <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${
-            card.label === 'High' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-          }`}>
-            {card.label}
-          </span>
-        )}
+function TaskCard({card,onDeleteClick}){
+  const labelColors={
+    High:"bg-rose-500/10 text-rose-400 border-rose-500/20",
+    Medium:"bg-amber-500/10 text-amber-400 border-amber-500/20",
+    Low: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+  };
+  return(
+    <div className="group relative bg-slate-900/90 border border-slate-700/50 hover:border-slate-600 p-3 rounded-lg shadow-xs hover:shadow-md transition-all duration-200">
+      <div className="flex justify-between items-center gap-2 mb-2">
+        <span className={`text-[10px] px-2 py-0.5 rounded-md border font-semibold tracking-wider uppercase ${labelColors[card.label] || "bg-slate-700 text-slate-300"}`}>
+          {card.label}
+        </span>
+        <button 
+          onClick={() => onDeleteClick(card._id)}
+          className="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-rose-400 text-sm p-1 rounded-sm hover:bg-slate-800 transition-all duration-200"
+          title="Delete Task"
+        >
+          🗑️
+        </button>
       </div>
-      {card.description && <p className="text-xs text-slate-400 line-clamp-2">{card.description}</p>}
+      <h4 className="text-sm font-semibold text-slate-200 tracking-wide line-clamp-2 mb-1">
+        {card.title}
+      </h4>
+      {card.description && (
+        <p className="text-xs text-slate-400 font-normal line-clamp-2 leading-relaxed">
+          {card.description}
+        </p>
+      )}
     </div>
   );
 }
