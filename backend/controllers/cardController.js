@@ -55,3 +55,30 @@ exports.deleteCard = async (req, res) => {
         res.status(500).json({ message: 'Server ERROR', error: error.message });
     }
 };
+exports.moveCard=async(req,res)=>{
+    try{
+        const {cardId}=req.params;
+        const{sourceListId,targetListId}=req.body;
+        if(!sourceListId||!targetListId){
+            return res.status(400).json({message:"Source and target list IDs are required"});
+
+        }
+        if (!updatedCard) {
+            return res.status(404).json({ message: "Card not found" });
+        }const List = require('../models/List'); 
+        await List.findByIdAndUpdate(sourceListId, {
+            $pull: { cards: cardId }
+        });
+        await List.findByIdAndUpdate(targetListId, {
+            $push: { cards: cardId }
+        });
+        res.status(200).json({ 
+            message: "Card migrated successfully in database", 
+            card: updatedCard 
+        });
+    }
+    catch(error){
+        console.error("Error in moveCard backend:", error);
+        res.status(500).json({ message: "Server Error", error: error.message });
+    }
+}
