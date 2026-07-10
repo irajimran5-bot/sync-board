@@ -12,9 +12,23 @@ function ListColumn({ list, onCardAdded,onCardDeleted }) {
     setCardTitle('');
     setIsAdding(false);
   };
-
+  const handleDrop=(e)=>{
+    e.preventDefault();
+    const cardId=e.dataTransfer.getData("text/plain");
+    const sourceListId=e.dataTransfer.getData("sourceListId");
+    const targetListId=list._id;
+    if(sourceListId===targetListId)
+      return;
+    console.log(`Card dropped: Card ${cardId} from ${sourceListId}->to ${targetListId}`);
+    if(onCardDropped){
+      onCardDropped(cardId,sourceListId,targetListId);
+    }
+  };
   return (
-    <div className="w-80 bg-slate-800/80 rounded-xl p-4 flex flex-col max-h-[80vh] border border-slate-700/60 shadow-lg">
+    <div 
+    onDragOver={handleDragOver} 
+    onDrop={handleDrop}
+    className="w-80 bg-slate-800/80 rounded-xl p-4 flex flex-col max-h-[80vh] border border-slate-700/60 shadow-lg">
 
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-bold text-slate-200 tracking-wide">{list.title}</h3>
