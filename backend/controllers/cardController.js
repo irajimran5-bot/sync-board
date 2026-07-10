@@ -59,22 +59,30 @@ exports.moveCard=async(req,res)=>{
     try{
         const {cardId}=req.params;
         const{sourceListId,targetListId}=req.body;
+        const CardModel = require('../models/Card');
+        const ListModel = require('../models/List');
         if(!sourceListId||!targetListId){
             return res.status(400).json({message:"Source and target list IDs are required"});
 
         }
-        if (!updatedCard) {
-            return res.status(404).json({ message: "Card not found" });
-        }const List = require('../models/List'); 
-        await List.findByIdAndUpdate(sourceListId, {
+        const savedCard = await CardModel.findByIdAndUpdate(
+            cardId,
+            { listId: targetListId },
+            { new: true }
+        );
+
+        if (!savedCard) {
+            return res.status(404).json({ message: "Target card not found" });
+        }
+        await ListModel.findByIdAndUpdate(sourceListId, {
             $pull: { cards: cardId }
         });
-        await List.findByIdAndUpdate(targetListId, {
+        await ListModel.findByIdAndUpdate(targetListId, {
             $push: { cards: cardId }
         });
-        res.status(200).json({ 
-            message: "Card migrated successfully in database", 
-            card: updatedCard 
+         return res.status(200).json({ 
+            message: "Card migrated successfully", 
+            card: savedCard 
         });
     }
     catch(error){
