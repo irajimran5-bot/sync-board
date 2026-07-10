@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import TaskCard from './TaskCard';
 
-function ListColumn({ list, onCardAdded,onCardDeleted }) {
+function ListColumn({ list, onCardAdded,onCardDeleted,onCardDropped }) {
   const [isAdding, setIsAdding] = useState(false);
   const [cardTitle, setCardTitle] = useState('');
 
@@ -11,6 +11,9 @@ function ListColumn({ list, onCardAdded,onCardDeleted }) {
     await onCardAdded(list._id, cardTitle);
     setCardTitle('');
     setIsAdding(false);
+  };
+  const handleDragOver = (e) => {
+    e.preventDefault(); 
   };
   const handleDrop=(e)=>{
     e.preventDefault();

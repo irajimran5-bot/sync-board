@@ -71,6 +71,15 @@ function App() {
     }
 
   }
+  const handleCardDrop = async (cardId, sourceListId, targetListId) => {
+    try {
+      console.log(`🎯 State Sync: Moving ${cardId} to Column ${targetListId}`);
+      alert(`Frontend drag action registered! Card: ${cardId} to target Column: ${targetListId}.`);
+      
+    } catch (err) {
+      console.error("Drag handler fault:", err);
+    }
+  };
   if (loading && !board) {
     return (
       <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center">
@@ -105,6 +114,7 @@ function App() {
           list={list} 
           onCardAdded={handleAddCard}
           onCardDeleted={handleCardDelete}
+          onCardDropped={handleCardDrop}
           />
         ))}
 
