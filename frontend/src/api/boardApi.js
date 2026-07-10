@@ -35,3 +35,15 @@ export const deleteCard=async(cardId)=>{
         throw error;
     }
 };
+export const moveCardInDatabase = async (cardId, sourceListId, targetListId) => {
+  try {
+    const response = await axios.patch(`/api/cards/${cardId}/move`, {
+      sourceListId,
+      targetListId
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating card migration:", error);
+    throw error;
+  }
+};
