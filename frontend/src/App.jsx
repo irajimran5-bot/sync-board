@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchBoardData, createList, createCard,deleteCard } from './api/boardApi'; 
+import { fetchBoardData, createList, createCard,deleteCard,moveCardInDatabase } from './api/boardApi'; 
 import ListColumn from './components/ListColumn';
 
 function App() {
@@ -74,10 +74,11 @@ function App() {
   const handleCardDrop = async (cardId, sourceListId, targetListId) => {
     try {
       console.log(`🎯 State Sync: Moving ${cardId} to Column ${targetListId}`);
-      alert(`Frontend drag action registered! Card: ${cardId} to target Column: ${targetListId}.`);
-      
+      await moveCardInDatabase(cardId,sourceListId,targetListId);
+      await getWorkspaceData();   
     } catch (err) {
       console.error("Drag handler fault:", err);
+      alert(`Failed to save new position:${err.message}`);
     }
   };
   if (loading && !board) {
