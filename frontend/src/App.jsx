@@ -104,7 +104,7 @@ function App() {
             <p className="text-xs text-slate-400 mt-0.5">{board?.description || "Collaborative Kanban space"}</p>
           </div>
           <div className="text-xs bg-slate-700/50 border border-slate-600 px-3 py-1 rounded-md text-slate-300">
-            Status: Fully Operational 
+            Status: Cloud Connected
           </div>
         </div>
       </header>
