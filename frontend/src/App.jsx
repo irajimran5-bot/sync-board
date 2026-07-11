@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {io} from 'socket.io-client';
 import { fetchBoardData, createList, createCard,deleteCard,moveCardInDatabase } from './api/boardApi'; 
 import ListColumn from './components/ListColumn';
-const socket=io('http://localhost:5000');
+const API_BASE = 'https://sync-board-eight.vercel.app';
+const socket=io('https://sync-board-eight.vercel.app');
 function App() {
   const [board, setBoard] = useState(null);
   const [loading, setLoading] = useState(true);

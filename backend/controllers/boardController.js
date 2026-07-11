@@ -14,22 +14,30 @@ exports.createBoard=async(req,res)=>{
 
     }
 };
-exports.getBoardById=async(req,res)=>{
-    try{
-        const board=await Board.findById(req.params.id).populate({
-            path:'lists',
-            populate:{
-                path:'cards',
-                model:'Card'
-
-            }
+const getBoardById = async (req, res) => {
+    try {
+        let board = await Board.findById(req.params.id).populate({
+            path: 'lists',
+            populate: { path: 'cards' }
         });
-        if(!board){
-            return res.status(404).json({message:'Target board not FOUND'});
-
+        if (!board) {
+            board = await Board.create({
+                _id: req.params.id,
+                title: "Production Workspace",
+                description: "Collaborative Kanban space"
+            });
+            board = await Board.findById(req.params.id).populate({
+                path: 'lists',
+                populate: { path: 'cards' }
+            });
         }
-        res.status(200).json(board);
-    }catch(error){
-        res.status(500).json({message:'Server fault',error:error.message})
+
+        return res.status(200).json(board);
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
     }
+};
+module.exports = {
+    createBoard,
+    getBoardById
 };
