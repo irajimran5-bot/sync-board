@@ -1,4 +1,5 @@
 import axios from "axios";
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 export const fetchBoardData=async(boardId)=>{
     try{
         const response = await axios.get(`/api/boards/${boardId}`);
