@@ -7,13 +7,12 @@ const dotenv=require('dotenv');
 
 dotenv.config();
 const app=express();
-app.use(cors());
+app.use(cors({origin:"*"}));
 app.use(express.json());
 const server=http.createServer(app);
 const io=new Server(server,{
     cors:{
-        origin:"http://localhost:5173",
-        methods:["GET","POST"]
+        origin:"*"
     }
 });
 const MONGO_URI=process.env.MONGO_URI||'mongodb://127.0.0.1:27017/syncboard';
