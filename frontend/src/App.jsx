@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import {io} from 'socket.io-client';
-import { fetchBoardData, createList, createCard,deleteCard,moveCardInDatabase } from './api/boardApi'; 
+import { fetchBoardData, createList, createCard, deleteCard, moveCardInDatabase } from './api/boardApi'; 
 import ListColumn from './components/ListColumn';
-const API_BASE = 'https://sync-board-eight.vercel.app';
-const socket=io('https://sync-board-eight.vercel.app');
+
 function App() {
   const [board, setBoard] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -30,13 +28,6 @@ function App() {
 
   useEffect(() => {
     getWorkspaceData();
-    socket.on('boardUpdated',(data)=>{
-      console.log("Change detected! Syncing state: ",data);
-      getWorkspaceData();
-    });
-    return()=>{
-      socket.off('boardUpdated');
-    };
   }, []);
 
   const handleAddList = async (e) => {
@@ -66,31 +57,31 @@ function App() {
       alert("Error adding card. Check console.");
     }
   };
+
   const handleCardDelete = async (cardId) => {
     if (!window.confirm("Are you sure you want to completely remove this task?")) 
       return;
     try {
-      console.log("✈️ Broadcasting Delete Trigger for ID:", cardId);
+      console.log("Broadcasting Delete Trigger for ID:", cardId);
       await deleteCard(cardId);
       await getWorkspaceData();
-    }catch(err){
-      console.error("MUTATION fault on delete",err);
-      alert(`Deletion aborted:${err.message}`);
-
-    }
-
-  }
-  const handleCardDrop = async (cardId, sourceListId, targetListId) => {
-    try {
-      console.log(`🎯 State Sync: Moving ${cardId} to Column ${targetListId}`);
-      await moveCardInDatabase(cardId,sourceListId,targetListId);
-      await getWorkspaceData();
-      socket.emit('cardMoved',{cardId,sourceListId,targetListId});   
-    } catch (err) {
-      console.error("Drag handler fault:", err);
-      alert(`Failed to save new position:${err.message}`);
+    } catch(err){
+      console.error("MUTATION fault on delete", err);
+      alert(`Deletion aborted: ${err.message}`);
     }
   };
+
+  const handleCardDrop = async (cardId, sourceListId, targetListId) => {
+    try {
+      console.log(`State Sync: Moving ${cardId} to Column ${targetListId}`);
+      await moveCardInDatabase(cardId, sourceListId, targetListId);
+      await getWorkspaceData();
+    } catch (err) {
+      console.error("Drag handler fault:", err);
+      alert(`Failed to save new position: ${err.message}`);
+    }
+  };
+
   if (loading && !board) {
     return (
       <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center">
@@ -121,11 +112,11 @@ function App() {
       <main className="flex-1 p-8 overflow-x-auto flex items-start gap-6">
         {board && board.lists && board.lists.map((list) => (
           <ListColumn 
-          key={list._id} 
-          list={list} 
-          onCardAdded={handleAddCard}
-          onCardDeleted={handleCardDelete}
-          onCardDropped={handleCardDrop}
+            key={list._id} 
+            list={list} 
+            onCardAdded={handleAddCard}
+            onCardDeleted={handleCardDelete}
+            onCardDropped={handleCardDrop}
           />
         ))}
 
@@ -136,7 +127,7 @@ function App() {
               id="new-list-input"
               name="newListTitle"
               className="w-full bg-slate-900 text-sm text-white p-2 rounded-lg border border-cyan-400 focus:outline-hidden"
-              placeholder="Enter column name (e.g., In Progress)..."
+              placeholder="Enter column name..."
               value={newListTitle}
               onChange={(e) => setNewListTitle(e.target.value)}
               autoFocus
