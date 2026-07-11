@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import {io} from 'socket.io-client';
 import { fetchBoardData, createList, createCard,deleteCard,moveCardInDatabase } from './api/boardApi'; 
 import ListColumn from './components/ListColumn';
-
+const socket=io('http://localhost:5000');
 function App() {
   const [board, setBoard] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -28,6 +29,13 @@ function App() {
 
   useEffect(() => {
     getWorkspaceData();
+    socket.on('boardUpdated',(data)=>{
+      console.log("Change detected! Syncing state: ",data);
+      getWorkspaceData();
+    });
+    return()=>{
+      socket.off('boardUpdated');
+    };
   }, []);
 
   const handleAddList = async (e) => {
@@ -75,7 +83,8 @@ function App() {
     try {
       console.log(`🎯 State Sync: Moving ${cardId} to Column ${targetListId}`);
       await moveCardInDatabase(cardId,sourceListId,targetListId);
-      await getWorkspaceData();   
+      await getWorkspaceData();
+      socket.emit('cardMoved',{cardId,sourceListId,targetListId});   
     } catch (err) {
       console.error("Drag handler fault:", err);
       alert(`Failed to save new position:${err.message}`);
