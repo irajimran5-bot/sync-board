@@ -9,7 +9,7 @@ function App() {
   const TARGET_BOARD_ID = "6a4a29348b37e4f8b7b2fce0"; 
   const [newListTitle, setNewListTitle] = useState('');
   const [isAddingList, setIsAddingList] = useState(false);
-
+  
   const getWorkspaceData = async () => {
     try {
       setLoading(true);
