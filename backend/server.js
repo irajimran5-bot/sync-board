@@ -8,15 +8,42 @@ const app = express();
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 
-// Strict connection using ONLY the string provided
-const MONGO_URI = process.env.MONGO_URI;
+let cachedConnection = null;
 
-mongoose.connect(MONGO_URI)
-  .then(() => console.log("Database Connection is SUCCESSFUL"))
-  .catch((err) => console.log('Critical FAILURE ->', err));
+async function connectDatabase() {
+    if (cachedConnection && mongoose.connection.readyState === 1) {
+        return cachedConnection;
+    }
+    
+    if (!process.env.MONGO_URI) {
+        throw new Error("MONGO_URI environment variable is completely missing in Vercel settings!");
+    }
+
+    
+    cachedConnection = await mongoose.connect(process.env.MONGO_URI, {
+        serverSelectionTimeoutMS: 5000 
+    });
+    
+    return cachedConnection;
+}
+
+
+app.use(async (req, res, next) => {
+    try {
+        await connectDatabase();
+        next();
+    } catch (err) {
+        console.error("DATABASE FAIL:", err.message);
+       
+        return res.status(500).json({ 
+            error: "Database Connection Failed", 
+            reason: err.message 
+        });
+    }
+});
 
 app.get('/', (req, res) => {
-    res.json({ message: "SyncBoard API is running smoothly" });
+    res.json({ message: "SyncBoard API is running smoothly and cloud database is verified!" });
 });
 
 app.use('/api/boards', require('./routes/boardRoutes'));
